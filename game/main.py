@@ -1,26 +1,55 @@
 import pygame
-import sys
-
+import os
 from pygame.locals import *
 
 
-def main_loop():
-    pygame.init()
+class App:
 
-    DISPLAYSURF = pygame.display.set_mode((1000, 1000))
+    windowWidth = 640
+    windowHeight = 480
+    x = 10
+    y = 10
 
-    pygame.display.set_caption('SMASH')
-    while True:
+    def __init__(self):
+        self._running = True
+        self._display_surf = None
+        self._image_surf = None
 
-            for event in pygame.event.get():
+    def on_init(self):
+        pygame.init()
+        self._display_surf = pygame.display.set_mode((self.windowWidth, self.windowHeight), pygame.HWSURFACE)
+        self._running = True
+        self._image_surf = pygame.image.load(os.path.join("resources", "smurf.png")).convert()
 
-                if event.type == QUIT:
-                    pygame.quit()
-                    sys.exit()
+    def on_event(self, event):
+        if event.type == QUIT:
+            self._running = False
 
-                pygame.draw.rect(DISPLAYSURF, (0, 255, 0), (100, 50, 20, 20))
-                pygame.display.update()
+    def on_loop(self):
+        pass
+
+    def on_render(self):
+        self._display_surf.blit(self._image_surf, (self.x, self.y))
+        pygame.display.flip()
+
+    def on_cleanup(self):
+        pygame.quit()
+
+    def on_execute(self):
+        if not self.on_init():
+            self._running = False
+
+        while self._running:
+
+                for event in pygame.event.get():
+                    self.on_event(event)
+
+                self.on_loop()
+                self.on_render()
+
+        self.on_cleanup()
 
 
 if __name__ == '__main__':
-    main_loop()
+    app = App()
+    app.on_execute()
